@@ -2,7 +2,7 @@
   "name": "diginary",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chromeless": "^1.5.2"
+    "axios": "^0.21.0",
+    "chromeless": "^1.5.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
   }
 }
