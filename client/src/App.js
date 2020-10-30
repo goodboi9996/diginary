@@ -14,17 +14,18 @@ class App extends Component {
   }
 
   handleSearch = async event => {
-    event.preventDefault()
-    // Hardcoding for now
-    const res = await fetch("http://localhost:9000/search?q=" + this.state.query);
-    console.log(res);
-    const data = await res.json();
-    console.log(data);
-    this.setState({ searchResults: data });
+    event.preventDefault();
+    if (this.state.query.trim()) {
+      // Hardcoding for now
+      const res = await fetch("http://localhost:9000/search?q=" + this.state.query);
+      const data = await res.json();
+      this.setState({ searchResults: data });
+    } else {
+      this.setState({ searchResults: [] });
+    }
   }
 
   render() {
-    console.log(this.state.searchResults);
     const results = this.state.searchResults.map(r => {
       return <li key={r.link}><a href={r.link}>{r.title}</a></li>
     });
