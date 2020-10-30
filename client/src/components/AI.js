@@ -10,11 +10,11 @@ const params = 10;
 class AI extends Component {
     constructor(props) {
         super(props);
-        let usr = math.random([1, constParams + params], -1, 1);
-        let res = math.random([constParams + params, 1], -1, 1);
+        let usr = math.random([constParams + params], -1, 1);
+        let res = math.random([constParams + params], -1, 1);
         for (let i = 0; i < constParams; i++) {
-            usr[0][i] = 0;
-            res[i][0] = 0;
+            usr[i] = 0;
+            res[i] = 0;
         }
         this.state = {
             user: usr,
@@ -22,14 +22,22 @@ class AI extends Component {
         };
     }
 
-    getMult() {
-        return math.multiply(this.state.user, this.state.resource);
+    getDot() {
+        return math.dot(this.state.user, this.state.resource);
+    }
+
+    getEucDist() {
+        return math.distance(this.state.user, this.state.resource);
+    }
+
+    getCosDist() {
+        return this.getDot() / math.distance(this.state.user, math.zeros(params + constParams)) / math.distance(this.state.resource, math.zeros(params + constParams));
     }
 
     render() {
         let tableData = [["User", "Resource"]];
         for (let i = 0; i < constParams + params; i++) {
-            tableData.push([this.state.user[0][i], this.state.resource[i][0]]);
+            tableData.push([this.state.user[i], this.state.resource[i]]);
         }
         return (
             <div id="AI">
@@ -42,7 +50,13 @@ class AI extends Component {
                         })}
                     </tbody>
                 </table>
-                <p>{"Result: " + this.getMult()[0][0]}</p>
+                <table>
+                    <tr>{"Dot Product: " + this.getDot()}</tr>
+                    <tr>{"Euclidean Distance: " + this.getEucDist()}</tr>
+                    <tr>{"Cosine Distance: " + this.getCosDist()}</tr>
+
+                </table>
+
             </div>
         );
     }
