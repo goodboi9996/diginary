@@ -7,6 +7,9 @@ import Search from './components/Search';
 
 class App extends Component {
   render() {
+    const results = this.state.searchResults.map(r => {
+      return <li key={r.link}><a href={r.link}>{r.title}</a></li>
+    });
     return (
       <BrowserRouter>
         <div className="App" >
