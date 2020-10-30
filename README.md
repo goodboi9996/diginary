@@ -1,5 +1,5 @@
 # Diginary
-Only 100 search queries per day
+100 search queries per day
 
 ## TODO:
 - AI
