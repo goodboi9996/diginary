@@ -1,4 +1,16 @@
 import React, { Component } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardImg,
+  CardBody,
+  CardFooter,
+  Button
+} from "shards-react";
 
 class Search extends Component {
   constructor(props) {
@@ -44,29 +56,65 @@ class Search extends Component {
         this.orderedSearchResultsList.push(orderedSearchResults[keys[i]]);
       }
     }
-    const results = this.orderedSearchResultsList.map(r => {
-      // const results = this.state.searchResults.map(r => {
+    // const results = this.orderedSearchResultsList.map(r => {
+    //   // const results = this.state.searchResults.map(r => {
+    //   let thumbnail;
+    //   if (r.pagemap && r.pagemap.cse_thumbnail) {
+    //     thumbnail = <img
+    //       src={r.pagemap.cse_thumbnail[0].src}
+    //       width={r.pagemap.cse_thumbnail[0].width}
+    //       height={r.pagemap.cse_thumbnail[0].height}
+    //       alt='' />
+    //   }
+    //   return <li key={r.link}>
+    //     <a
+    //       // href={r.link} target="_blank" 
+    //       onClick={() => {
+    //         this.app.handleLinkClick(r.link)
+    //       }}
+    //       style={{ fontWeight: (r.link in this.app.state.resourceData) ? "bold" : "normal" }}
+    //     >{r.title}</a>
+    //     <p>{r.snippet}</p>
+    //     {thumbnail}
+    //     <br /><br />
+    //   </li>
+    // });
+
+    const cards = this.orderedSearchResultsList.map(r => {
       let thumbnail;
       if (r.pagemap && r.pagemap.cse_thumbnail) {
-        thumbnail = <img
+        thumbnail = <CardImg
+          top
           src={r.pagemap.cse_thumbnail[0].src}
           width={r.pagemap.cse_thumbnail[0].width}
           height={r.pagemap.cse_thumbnail[0].height}
           alt='' />
       }
-      return <li key={r.link}>
-        <a
-          // href={r.link} target="_blank" 
-          onClick={() => {
-            this.app.handleLinkClick(r.link)
-          }}
-          style={{ fontWeight: (r.link in this.app.state.resourceData) ? "bold" : "normal" }}
-        >{r.title}</a>
-        <p>{r.snippet}</p>
+      return <Card key={r.link}>
+        <CardHeader>{r.displayLink}</CardHeader>
         {thumbnail}
-        <br /><br />
-      </li>
+        <CardBody>
+          <CardTitle>{r.title}</CardTitle>
+          <p>{r.snippet}</p>
+          <Button href={r.link}>Learn More &rarr;</Button>
+        </CardBody>
+      </Card>
     });
+
+    const rows = [];
+    let row = [];
+    for (let i = 0; i < cards.length; i++) {
+      row.push(<Col>{cards[i]}</Col>);
+      if (row.length == this.props.rowSize) {
+        rows.push(<Row>{row}</Row>, <br />);
+        row = [];
+      }
+    }
+    if (row.length > 0) {
+      rows.push(<Row>{row}</Row>);
+    }
+    console.log(rows);
+
     return (
       <div className="Search" >
         <h1>Search</h1>
@@ -81,7 +129,7 @@ class Search extends Component {
           </label>
           <input type='submit' value='Search' />
         </form>
-        <ul>{results}</ul>
+        <Container>{rows}</Container>
       </div>
     );
   }

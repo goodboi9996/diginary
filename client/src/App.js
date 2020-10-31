@@ -169,7 +169,7 @@ class App extends Component {
         <div className="App" >
           <Navibar userList={userList} appPtr={this} />
           <Route path='/search' render={(props) => (
-            <Search {...props} appPtr={this} />
+            <Search {...props} appPtr={this} rowSize={4} />
           )} />
           <Route
             path='/aipage'
