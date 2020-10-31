@@ -26,9 +26,21 @@ class Search extends Component {
   }
 
   render() {
-    console.log(this.state.searchResults);
     const results = this.state.searchResults.map(r => {
-      return <li key={r.link}><a href={r.link}>{r.title}</a></li>
+      let thumbnail;
+      if (r.pagemap && r.pagemap.cse_thumbnail) {
+        thumbnail = <img
+          src={r.pagemap.cse_thumbnail[0].src}
+          width={r.pagemap.cse_thumbnail[0].width}
+          height={r.pagemap.cse_thumbnail[0].height}
+          alt='' />
+      }
+      return <li key={r.link}>
+        <a href={r.link}>{r.title}</a>
+        <p>{r.snippet}</p>
+        {thumbnail}
+        <br /><br />
+      </li>
     });
     return (
       <div className="Search" >
