@@ -5,7 +5,6 @@ const config = {};
 const math = create(all, config);
 
 const constParams = 1;
-const regularization = false;
 const params = 10;
 //global for whole project
 const learningRate = 1;
@@ -21,7 +20,8 @@ class AI extends Component {
         }
         this.state = {
             user: usr,
-            resource: res
+            resource: res,
+            regularization: true
         };
     }
 
@@ -37,10 +37,15 @@ class AI extends Component {
         return this.getDot() / math.distance(this.state.user, math.zeros(params + constParams)) / math.distance(this.state.resource, math.zeros(params + constParams));
     }
 
-    trainUser = (customlr, lambda) => {
-        // console.log(this);
-        let gradient = math.subtract(this.state.user, this.state.resource);
-        if (regularization) {
+    // sigmoid(x){
+    //     return 
+    // }
+
+    trainUser = (customlr, lambda, dotTarget) => {
+        let output = this.getDot();
+        let gradient = math.multiply(output - dotTarget, this.state.resource)
+        // let gradient = math.subtract(this.state.user, this.state.resource);
+        if (this.state.regularization) {
             gradient = math.add(gradient, math.multiply(lambda, this.state.user));
         }
         // console.log(gradient); console.log(math.multiply(3, gradient));
@@ -50,16 +55,20 @@ class AI extends Component {
         this.setState({ user: math.add(this.state.user, math.multiply(-1 * customlr * learningRate, gradient)) });
     }
 
-
-    trainResource = (customlr, lambda) => {
-        let gradient = math.subtract(this.state.resource, this.state.user);
-        if (regularization) {
+    trainResource = (customlr, lambda, dotTarget) => {
+        let output = this.getDot();
+        let gradient = math.multiply(output - dotTarget, this.state.user)
+        if (this.state.regularization) {
             gradient = math.add(gradient, math.multiply(lambda, this.state.resource));
         }
         for (let i = 0; i < constParams; i++) {
             gradient[i] = 0;
         }
         this.setState({ resource: math.add(this.state.resource, math.multiply(-1 * customlr * learningRate, gradient)) });
+    }
+
+    toggleRegularization = () => {
+        this.setState({ regularization: !this.state.regularization });
     }
 
 
@@ -85,8 +94,11 @@ class AI extends Component {
                         <tr><th>{"Euclidean Distance: " + this.getEucDist()}</th></tr>
                         <tr><th>{"Cosine Distance: " + this.getCosDist()}</th></tr>
                         <tr><th>{"Learning Rate: " + learningRate}</th></tr>
-                        <tr><th><button onClick={() => { this.trainUser(0.1, 1) }}>Train User</button></th></tr>
-                        <tr><th><button onClick={() => { this.trainResource(0.1, 1) }}>Train Resource</button></th></tr>
+                        <tr><th><button onClick={() => { this.trainUser(0.1, 1, 1) }}>Train User (Target=1)</button></th></tr>
+                        <tr><th><button onClick={() => { this.trainResource(0.1, 1, 1) }}>Train Resource (Target=1)</button></th></tr>
+                        <tr><th><button onClick={() => { this.trainUser(0.1, 1, -1) }}>Train User (Target=-1)</button></th></tr>
+                        <tr><th><button onClick={() => { this.trainResource(0.1, 1, -1) }}>Train Resource (Target=-1)</button></th></tr>
+                        <tr><th><button onClick={this.toggleRegularization}>Regularization: {this.state.regularization ? "True" : "False"}</button></th></tr>
                     </tbody>
                 </table>
 
