@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
-import Navbar from './components/Navbar';
+import Navibar from './components/Navibar';
 import Test from './components/Test';
 import Search from './components/Search';
 import AIpage from './components/AIpage';
@@ -158,11 +158,16 @@ class App extends Component {
       this.trainResource(linkShowResLR, this.state.currentUser, resourceKey, linkShowResTarget);
     }
   }
+  switchUser = (userKey) => {
+    if (userKey in this.state.userData) {
+      this.setState({ currentUser: userKey });
+    }
+  }
   render() {
     return (
       <BrowserRouter>
         <div className="App" >
-          <Navbar />
+          <Navibar userList={userList} appPtr={this} />
           <Route path='/search' render={(props) => (
             <Search {...props} appPtr={this} />
           )} />
