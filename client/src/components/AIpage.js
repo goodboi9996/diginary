@@ -41,7 +41,8 @@ class AIpage extends Component {
         this.state = {
             user: usr,
             resource: res,
-            regularization: true
+            regularization: true,
+            rand: math.random()
         };
     }
 

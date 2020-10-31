@@ -16,8 +16,21 @@ const userList = ["goodboi9996", "6176UD"];
 const params = 10;
 const activation = "sigmoid";
 const costfunction = "mse";
-const globalLearningRate = 1;
+const globalLearningRate = 0.5;
 const globalLambda = 0;
+
+//settings
+const linkClickCred = 0;
+const linkShowCred = 0;
+const linkClickResTarget = 1;
+const linkClickResLR = 1;
+const linkShowResTarget = 0;
+const linkShowResLR = 0.1;
+const linkClickUsrTarget = 1;
+const linkClickUsrLR = 1;
+const linkShowUsrTarget = 1;
+const linkShowUsrLR = 0.1;
+//make user cred later?
 
 class App extends Component {
   constructor(props) {
@@ -26,11 +39,14 @@ class App extends Component {
     let resourceData = {};
     resourceList.forEach((x) => { resourceData[x] = { vec: math.random([params], -1, 1), cred: math.random(-1, 1) } })
     let userData = {};
-    userList.forEach((x) => { userData[x] = { vec: math.random([params], -1, 1) } })
+    userList.forEach((x) => { userData[x] = { vec: math.random([params], -1, 1), searchHistory: [], viewHistory: [] } })
     this.state = {
-      resourceData, userData
+      resourceData, userData, currentUser: userList[0]
     };
-    console.log(this.state);
+    this.handleLinkClick = this.handleLinkClick.bind(this);
+    this.handleLinkShow = this.handleLinkShow.bind(this);
+
+    // console.log(this.state);
   }
 
   actF = {
@@ -53,6 +69,32 @@ class App extends Component {
     ]
   };
 
+  resUpdates = {};
+  resCredUpdates = {};
+  usrUpdates = {};
+
+  updateWeights = () => {
+    let ud = this.state.userData;
+    for (let userKey in this.usrUpdates) {
+      ud[userKey].vec = math.subtract(ud[userKey].vec, this.usrUpdates[userKey]);
+    }
+    let rd = this.state.resourceData;
+    for (let resourceKey in this.resUpdates) {
+      if (!resourceKey in this.state.resourceData) {
+        console.log(resourceKey);
+      } else {
+        rd[resourceKey].vec = math.subtract(rd[resourceKey].vec, this.resUpdates[resourceKey]);
+      }
+    }
+    for (let resourceKey in this.resCredUpdates) {
+      rd[resourceKey].cred += this.resCredUpdates[resourceKey];
+    }
+    this.setState({ userData: ud, resourceData: rd })
+    this.resUpdates = {};
+    this.resCredUpdates = {};
+    this.usrUpdates = {};
+  }
+
   getGrad = (x, theta, target, actf, costf, lambda) => {
     let dotOutput = math.dot(x, theta);
     let output = this.actF[actf][0](dotOutput);
@@ -66,29 +108,64 @@ class App extends Component {
 
   trainUser = (lr, userKey, resourceKey, target) => {
     let grad = this.getGrad(this.state.resourceData[resourceKey].vec, this.state.userData[userKey].vec, target, activation, costfunction, globalLambda);
-    let ud = this.state.userData;
-    ud[userKey].vec = math.subtract(ud[userKey].vec, math.multiply(lr * globalLearningRate, grad));
-    this.setState({ userData: ud });
+    if (userKey in this.usrUpdates) {
+      this.usrUpdates[userKey] = math.add(this.usrUpdates[userKey], math.multiply(lr * globalLearningRate, grad));
+    } else {
+      this.usrUpdates[userKey] = math.multiply(lr * globalLearningRate, grad);
+    }
   }
 
   trainResource = (lr, userKey, resourceKey, target) => {
-    let grad = this.getGrad(this.state.userData[userKey].vec, this.state.resourceData[resourceKey].vec, target, activation, costfunction, globalLambda);
-    let rd = this.state.resourceData;
-    rd[resourceKey].vec = math.subtract(rd[resourceKey].vec, math.multiply(lr * globalLearningRate, grad));
-    this.setState({ resourceData: rd });
+    if (resourceKey in this.state.resourceData) {
+      let grad = this.getGrad(this.state.userData[userKey].vec, this.state.resourceData[resourceKey].vec, target, activation, costfunction, globalLambda);
+      if (resourceKey in this.resUpdates) {
+        this.resUpdates[resourceKey] = math.add(this.resUpdates[resourceKey], math.multiply(lr * globalLearningRate, grad));
+      } else {
+        this.resUpdates[resourceKey] = math.multiply(lr * globalLearningRate, grad);
+      }
+    }
   }
 
   getRating = (userKey, resourceKey) => {
-    return this.actF[activation][0](this.state.resourceData[resourceKey].cred + math.dot(this.state.userData[userKey].vec, this.state.resourceData[resourceKey].vec));
+    if ((resourceKey in this.state.resourceData) && (userKey in this.state.userData)) {
+      return this.actF[activation][0](this.state.resourceData[resourceKey].cred + math.dot(this.state.userData[userKey].vec, this.state.resourceData[resourceKey].vec));
+    }
+    console.log(userKey);
+    return math.random(0, 1) - 100;
   }
 
-
+  handleLinkClick = (resourceKey) => {
+    if (resourceKey in this.state.resourceData) {
+      if (resourceKey in this.resCredUpdates) {
+        this.resCredUpdates[resourceKey] += linkClickCred;
+      } else {
+        this.resCredUpdates[resourceKey] = linkClickCred;
+      }
+      this.trainUser(linkClickUsrLR, this.state.currentUser, resourceKey, linkClickUsrTarget);
+      this.trainResource(linkClickResLR, this.state.currentUser, resourceKey, linkClickResTarget);
+    }
+    this.updateWeights();
+    console.log(this.getRating(this.state.currentUser, resourceKey));
+  }
+  handleLinkShow = (resourceKey) => {
+    if (resourceKey in this.state.resourceData) {
+      if (resourceKey in this.resCredUpdates) {
+        this.resCredUpdates[resourceKey] += linkShowCred;
+      } else {
+        this.resCredUpdates[resourceKey] = linkShowCred;
+      }
+      this.trainUser(linkShowUsrLR, this.state.currentUser, resourceKey, linkShowUsrTarget);
+      this.trainResource(linkShowResLR, this.state.currentUser, resourceKey, linkShowResTarget);
+    }
+  }
   render() {
     return (
       <BrowserRouter>
         <div className="App" >
           <Navbar />
-          <Route path='/search' component={Search} />
+          <Route path='/search' render={(props) => (
+            <Search {...props} appPtr={this} />
+          )} />
           <Route
             path='/aipage'
             render={(props) => (
