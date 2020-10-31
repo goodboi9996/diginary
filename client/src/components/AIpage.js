@@ -102,6 +102,9 @@ class AIpage extends Component {
         this.setState({ regularization: !this.state.regularization });
     }
 
+    search = () => {
+
+    }
 
     render() {
         let tableData = [["User", "Resource"]];

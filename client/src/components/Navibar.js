@@ -8,6 +8,15 @@ class Navibar extends Component {
     super(props);
     this.state = {};
   }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(e.target["0"].value);
+  }
+  // handleQueryChange = (e) => {
+  //   console.log(e);
+  // }
+
   render() {
     // console.log(this.props.userList.map(x => { }))
     return (
@@ -25,6 +34,7 @@ class Navibar extends Component {
             <NavDropdown title={"Signed in as: " + this.props.appPtr.state.currentUser} id="basic-nav-dropdown">
               {this.props.userList.map(x => {
                 return <NavDropdown.Item
+                  key={x}
                   onClick={() => { this.props.appPtr.switchUser(x) }}
                 >{x}</NavDropdown.Item>
               })}
@@ -33,9 +43,9 @@ class Navibar extends Component {
               {/* <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item> */}
             </NavDropdown>
           </Nav>
-          <Form inline>
-            <FormControl type="text" placeholder="Search" className="mr-sm-3" />
-            <Button variant="outline-primary" >Search</Button>
+          <Form inline onSubmit={this.handleSubmit}>
+            <FormControl type="text" placeholder="Search" className="mr-sm-2" onChange={this.handleQueryChange} />
+            <Button variant="outline-primary" type="submit">Search</Button>
           </Form>
         </Navbar.Collapse>
       </Navbar >
