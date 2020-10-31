@@ -29,7 +29,7 @@ const cost = {
     ]
 }
 
-class AI extends Component {
+class AIpage extends Component {
     constructor(props) {
         super(props);
         let usr = math.random([constParams + params], -1, 1);
@@ -108,7 +108,7 @@ class AI extends Component {
             tableData.push([this.state.user[i], this.state.resource[i]]);
         }
         return (
-            <div id="AI">
+            <div id="AIpage">
                 <table style={{ width: "50%" }}>
                     <tbody>
                         {tableData.map((x, i) => {
@@ -143,4 +143,4 @@ class AI extends Component {
         );
     }
 }
-export default AI;
+export default AIpage;

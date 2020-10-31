@@ -7,7 +7,7 @@ let Navbar = () => {
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/search">Search</a></li>
-        <li><a href="/ai">AI</a></li>
+        <li><a href="/aipage">AI</a></li>
         <li><a href="/test">Test</a></li>
       </ul>
     </div>
