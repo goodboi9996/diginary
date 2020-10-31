@@ -5,7 +5,10 @@ const config = {};
 const math = create(all, config);
 
 const constParams = 1;
+const regularization = false;
 const params = 10;
+//global for whole project
+const learningRate = 1;
 
 class AI extends Component {
     constructor(props) {
@@ -34,6 +37,32 @@ class AI extends Component {
         return this.getDot() / math.distance(this.state.user, math.zeros(params + constParams)) / math.distance(this.state.resource, math.zeros(params + constParams));
     }
 
+    trainUser = (customlr, lambda) => {
+        // console.log(this);
+        let gradient = math.subtract(this.state.user, this.state.resource);
+        if (regularization) {
+            gradient = math.add(gradient, math.multiply(lambda, this.state.user));
+        }
+        // console.log(gradient); console.log(math.multiply(3, gradient));
+        for (let i = 0; i < constParams; i++) {
+            gradient[i] = 0;
+        }
+        this.setState({ user: math.add(this.state.user, math.multiply(-1 * customlr * learningRate, gradient)) });
+    }
+
+
+    trainResource = (customlr, lambda) => {
+        let gradient = math.subtract(this.state.resource, this.state.user);
+        if (regularization) {
+            gradient = math.add(gradient, math.multiply(lambda, this.state.resource));
+        }
+        for (let i = 0; i < constParams; i++) {
+            gradient[i] = 0;
+        }
+        this.setState({ resource: math.add(this.state.resource, math.multiply(-1 * customlr * learningRate, gradient)) });
+    }
+
+
     render() {
         let tableData = [["User", "Resource"]];
         for (let i = 0; i < constParams + params; i++) {
@@ -51,10 +80,14 @@ class AI extends Component {
                     </tbody>
                 </table>
                 <table>
-                    <tr>{"Dot Product: " + this.getDot()}</tr>
-                    <tr>{"Euclidean Distance: " + this.getEucDist()}</tr>
-                    <tr>{"Cosine Distance: " + this.getCosDist()}</tr>
-
+                    <tbody>
+                        <tr><th>{"Dot Product: " + this.getDot()}</th></tr>
+                        <tr><th>{"Euclidean Distance: " + this.getEucDist()}</th></tr>
+                        <tr><th>{"Cosine Distance: " + this.getCosDist()}</th></tr>
+                        <tr><th>{"Learning Rate: " + learningRate}</th></tr>
+                        <tr><th><button onClick={() => { this.trainUser(0.1, 1) }}>Train User</button></th></tr>
+                        <tr><th><button onClick={() => { this.trainResource(0.1, 1) }}>Train Resource</button></th></tr>
+                    </tbody>
                 </table>
 
             </div>
