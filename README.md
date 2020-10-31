@@ -6,4 +6,14 @@
 - Search and recommended
 - Navbar
 
-Search is main page
+## RUN:
+Dependencies:
+- cd client
+- npm install
+- cd ../server
+- npm install
+Run:
+- cd client
+- npm start
+- cd server
+- node .
