@@ -12,6 +12,7 @@ Dependencies:
 - npm install
 - cd ../server
 - npm install
+
 Run:
 - cd client
 - npm start
