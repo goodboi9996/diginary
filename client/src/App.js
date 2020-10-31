@@ -198,7 +198,7 @@ class App extends Component {
           <Navibar userList={userList} appPtr={this}
           // searchPtr={search} 
           />
-          <Search appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />;
+          <Search appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />
           <Route
             path='/aipage'
             render={(props) => (

@@ -122,18 +122,22 @@ class Search extends Component {
     return (
       <div className="Search" >
         <h1>Search</h1>
-        <form onSubmit={this.makeSearch}>
-          <label>
-            Query:
+        {
+          (window.location.pathname == "/search") ? (
+            <form onSubmit={this.makeSearch}>
+              <label>
+                Query:
             <input
-              type='text'
-              maxLength='50'
-              value={this.state.query}
-            // onChange={this.handleQueryChange} 
-            />
-          </label>
-          <input type='submit' value='Search' />
-        </form>
+                  type='text'
+                  maxLength='50'
+                  value={this.state.query}
+                // onChange={this.handleQueryChange} 
+                />
+              </label>
+              <input type='submit' value='Search' />
+            </form>
+          ) : null
+        }
         <Container>{rows}</Container>
       </div>
     );
