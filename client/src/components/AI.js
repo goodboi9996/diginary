@@ -9,6 +9,26 @@ const params = 10;
 //global for whole project
 const learningRate = 1;
 
+const actF = {
+    "none": [x => { return x; }, () => { return 1; }],
+    "sigmoid": [x => { return 1 / (1 + math.exp(-x)); }, (x => {
+        let s = 1 / (1 + math.exp(-x));
+        return s * (1 - s);
+    })]
+}
+
+const cost = {
+    "mse": [(x, target) => { return (x - target) * (x - target); }, (x, target) => { return 2 * (x - target); }],
+    "ce": [
+        (x, target) => {
+            return -target * math.log(x) + (1 - target) * math.log(1 - x);
+        },
+        (x, target) => {
+            return -target / x - (1 - target) / (1 - x);
+        }
+    ]
+}
+
 class AI extends Component {
     constructor(props) {
         super(props);
@@ -25,6 +45,8 @@ class AI extends Component {
         };
     }
 
+    app = this.props.appPtr;
+
     getDot() {
         return math.dot(this.state.user, this.state.resource);
     }
@@ -36,10 +58,6 @@ class AI extends Component {
     getCosDist() {
         return this.getDot() / math.distance(this.state.user, math.zeros(params + constParams)) / math.distance(this.state.resource, math.zeros(params + constParams));
     }
-
-    // sigmoid(x){
-    //     return 
-    // }
 
     trainUser = (customlr, lambda, dotTarget) => {
         let output = this.getDot();
@@ -65,6 +83,18 @@ class AI extends Component {
             gradient[i] = 0;
         }
         this.setState({ resource: math.add(this.state.resource, math.multiply(-1 * customlr * learningRate, gradient)) });
+    }
+
+    getGrad = (x, theta, target, actf, costf, lambda) => {
+        let dotOutput = math.dot(x, theta);
+        let output = actF[actf][0](dotOutput);
+        // let costV = cost[costf][0](output, target);
+        let costG = cost[costf][1](output, target);
+        let outputG = costG * actF[actf][1](dotOutput);
+        let grad = math.multiply(outputG, x);
+        grad = math.add(grad, math.multiply(lambda, theta));
+
+        return grad;
     }
 
     toggleRegularization = () => {
@@ -94,15 +124,22 @@ class AI extends Component {
                         <tr><th>{"Euclidean Distance: " + this.getEucDist()}</th></tr>
                         <tr><th>{"Cosine Distance: " + this.getCosDist()}</th></tr>
                         <tr><th>{"Learning Rate: " + learningRate}</th></tr>
-                        <tr><th><button onClick={() => { this.trainUser(0.1, 1, 1) }}>Train User (Target=1)</button></th></tr>
+                        <tr><th>{"Sigmoid: " + actF["sigmoid"][0](this.getDot())}</th></tr>
+
+                        {/* <tr><th><button onClick={() => { this.trainUser(0.1, 1, 1) }}>Train User (Target=1)</button></th></tr>
                         <tr><th><button onClick={() => { this.trainResource(0.1, 1, 1) }}>Train Resource (Target=1)</button></th></tr>
                         <tr><th><button onClick={() => { this.trainUser(0.1, 1, -1) }}>Train User (Target=-1)</button></th></tr>
                         <tr><th><button onClick={() => { this.trainResource(0.1, 1, -1) }}>Train Resource (Target=-1)</button></th></tr>
-                        <tr><th><button onClick={this.toggleRegularization}>Regularization: {this.state.regularization ? "True" : "False"}</button></th></tr>
+                        <tr><th><button onClick={this.toggleRegularization}>Regularization: {this.state.regularization ? "True" : "False"}</button></th></tr> */}
+                        <tr><th><button onClick={() => { this.setState({ user: math.subtract(this.state.user, this.getGrad(this.state.resource, this.state.user, 1, "sigmoid", "mse", 0)) }) }}>Backprop User to 1</button></th></tr>
+                        <tr><th><button onClick={() => { this.setState({ resource: math.subtract(this.state.resource, this.getGrad(this.state.user, this.state.resource, 1, "sigmoid", "mse", 0)) }) }}>Backprop Resource to 1</button></th></tr>
+                        <tr><th><button onClick={() => { this.setState({ user: math.subtract(this.state.user, this.getGrad(this.state.resource, this.state.user, 0, "sigmoid", "mse", 0)) }) }}>Backprop User to 0</button></th></tr>
+                        <tr><th><button onClick={() => { this.setState({ resource: math.subtract(this.state.resource, this.getGrad(this.state.user, this.state.resource, 0, "sigmoid", "mse", 0)) }) }}>Backprop Resource to 0</button></th></tr>
+
                     </tbody>
                 </table>
 
-            </div>
+            </div >
         );
     }
 }
