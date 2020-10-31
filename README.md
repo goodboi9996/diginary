@@ -16,5 +16,5 @@ Dependencies:
 Run:
 - cd client
 - npm start
-- cd server
+- cd ../server
 - node .
