@@ -10,7 +10,7 @@ const math = create(all, config);
 
 //our "database"
 const resourceList = ["https://www.mathsisfun.com/", "https://www.khanacademy.org/math", "http://www.math.com/", "https://www.mathplayground.com/", "https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math", "https://en.wikipedia.org/wiki/English_language", "https://www.ets.org/toefl", "https://en.wikipedia.org/wiki/English", "https://www.cambridgeenglish.org/", "https://www.elections.ny.gov/NYSBOE/download/voting/AbsenteeBallot-English.pdf"]
-const userList = ["goodboi9996", "6176UD"];
+const userList = ["goodboi9996", "6176UD", "3"];
 
 //hyperparameters
 const params = 10;
@@ -37,11 +37,12 @@ class App extends Component {
     super(props);
     //first is credibility (manually changed)
     let resourceData = {};
-    resourceList.forEach((x) => { resourceData[x] = { vec: math.random([params], -1, 1), cred: math.random(-1, 1) } })
+    resourceList.forEach((x) => { resourceData[x] = { vec: math.random([params], -1, 1), cred: 0 } })
     let userData = {};
     userList.forEach((x) => { userData[x] = { vec: math.random([params], -1, 1), searchHistory: [], viewHistory: [] } })
     this.state = {
-      resourceData, userData, currentUser: userList[0]
+      resourceData, userData, currentUser: userList[0],
+      searchResults: []
     };
     this.handleLinkClick = this.handleLinkClick.bind(this);
     this.handleLinkShow = this.handleLinkShow.bind(this);
@@ -163,14 +164,41 @@ class App extends Component {
       this.setState({ currentUser: userKey });
     }
   }
+  orderedSearchResultsList = [];
+  handleSearch = async (e, handleShow) => {
+    e.preventDefault();
+    let data = [];
+    if (e.target["0"].value.trim()) {
+      const res = await fetch("http://localhost:9000/search?q=" + e.target[0].value);
+      data = await res.json();
+    }
+    if (data) {
+      this.orderedSearchResultsList = [];
+      this.setState({ searchResults: data });
+      data.forEach(x => { this.handleLinkShow(x.link) });
+    }
+  }
   render() {
+    if (Array.isArray(this.state.searchResults) && this.state.searchResults.length && !this.orderedSearchResultsList.length) {
+      let orderedSearchResults = {};
+      this.state.searchResults.forEach(x => {
+        orderedSearchResults[-this.getRating(this.state.currentUser, x.link)] = x;
+      })
+      let keys = Object.keys(orderedSearchResults), i, len = keys.length;
+      keys.sort(function (a, b) { return a - b });
+      for (i = 0; i < len; i++) {
+        console.log(keys[i] + orderedSearchResults[keys[i]].link);
+        this.orderedSearchResultsList.push(orderedSearchResults[keys[i]]);
+      }
+    }
+
     return (
       <BrowserRouter>
         <div className="App" >
-          <Navibar userList={userList} appPtr={this} />
-          <Route path='/search' render={(props) => (
-            <Search {...props} appPtr={this} rowSize={4} />
-          )} />
+          <Navibar userList={userList} appPtr={this}
+          // searchPtr={search} 
+          />
+          <Search appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />;
           <Route
             path='/aipage'
             render={(props) => (

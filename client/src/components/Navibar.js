@@ -10,8 +10,11 @@ class Navibar extends Component {
   }
 
   handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(e.target["0"].value);
+    // e.preventDefault();
+    // console.log(this.props.appPtr);
+    // console.log(this.props.searchPtr);
+    // this.props.searchPtr.handleSearch(e.target["0"].value);
+    this.props.appPtr.handleSearch(e);
   }
   // handleQueryChange = (e) => {
   //   console.log(e);
