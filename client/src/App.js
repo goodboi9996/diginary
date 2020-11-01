@@ -10,7 +10,8 @@ const config = {};
 const math = create(all, config);
 
 //our "database"
-const resourceList = ["https://www.mathsisfun.com/", "https://www.khanacademy.org/math", "http://www.math.com/", "https://www.mathplayground.com/", "https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math", "https://en.wikipedia.org/wiki/English_language", "https://www.ets.org/toefl", "https://en.wikipedia.org/wiki/English", "https://www.cambridgeenglish.org/", "https://www.elections.ny.gov/NYSBOE/download/voting/AbsenteeBallot-English.pdf"]
+const resourceList = ["https://www.mathsisfun.com/", "https://www.khanacademy.org/math", "http://www.math.com/", "https://www.mathplayground.com/", "https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math", "https://en.wikipedia.org/wiki/English_language", "https://www.ets.org/toefl", "https://en.wikipedia.org/wiki/English", "https://www.cambridgeenglish.org/", "https://www.elections.ny.gov/NYSBOE/download/voting/AbsenteeBallot-English.pdf",
+  "https://owl.purdue.edu/", "https://www.act.org/content/act/en/products-and-services/the-act/test-preparation/english-practice-test-questions.html", "https://englishtest.duolingo.com/", "https://www.ielts.org/en-us", "https://www.mathway.com/", "https://www.mathgames.com/", "https://docs.python.org/3/library/math.html", "https://www.ixl.com/%22,%22https://www.coolmath.com/"]
 const userList = ["User 1", "User 2", "User 3"];
 
 //hyperparameters
