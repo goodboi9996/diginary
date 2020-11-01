@@ -5,6 +5,7 @@
 - Database / Storage
 - Rating
 - Adding Resources
+- More AI optimizations
 - Make into Chrome extension
 
 ## RUN:
