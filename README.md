@@ -1,10 +1,11 @@
 # Diginary
 100 search queries per day
 
-## TODO:
-- Feed post
-- Search and recommended
-- Navbar
+## Expanding:
+- Database / Storage
+- Rating
+- Adding Resources
+- Make into Chrome extension
 
 ## RUN:
 Dependencies:
