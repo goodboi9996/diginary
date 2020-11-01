@@ -4,6 +4,7 @@ import Navibar from './components/Navibar';
 import Test from './components/Test';
 import Search from './components/Search';
 import AIpage from './components/AIpage';
+import Feed from './components/Feed';
 import { create, all } from 'mathjs';
 const config = {};
 const math = create(all, config);
@@ -199,6 +200,12 @@ class App extends Component {
           // searchPtr={search} 
           />
           <Search appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />
+          <Route
+            path='/feed'
+            render={(props) => (
+              <Feed {...props} appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />
+            )}
+          />
           <Route
             path='/aipage'
             render={(props) => (
