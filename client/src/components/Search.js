@@ -116,9 +116,9 @@ class Search extends Component {
           row = [];
         }
       }
-      if (row.length > 0) {
-        rows.push(<Row>{row}</Row>);
-      }
+      // if (row.length > 0) {
+      //   rows.push(<Row>{row}</Row>);
+      // }
       // console.log(rows);
     } else { rows = [] }
 
