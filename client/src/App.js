@@ -152,7 +152,7 @@ class App extends Component {
       this.trainResource(linkClickResLR, this.state.currentUser, resourceKey, linkClickResTarget);
     }
     this.updateWeights();
-    console.log(this.getRating(this.state.currentUser, resourceKey));
+    // console.log(this.getRating(this.state.currentUser, resourceKey));
 
     let ch = this.state.clickHistory;
     for (let i = 0; i < ch.length; i++) {
@@ -228,7 +228,7 @@ class App extends Component {
       })
       let keys = Object.keys(orderedFeedResults), i, len = keys.length;
       keys.sort(function (a, b) { return b - a });
-      console.log([orderedFeedResults, "feed"]);
+      console.log(["feed", orderedFeedResults]);
       for (i = 0; i < len; i++) {
         orderedFeedResultsList.push(orderedFeedResults[keys[i]]);
       }
