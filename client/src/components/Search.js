@@ -98,7 +98,7 @@ class Search extends Component {
               // href={r.link}
               target="_blank"
               onClick={() => {
-                this.app.handleLinkClick(r.link)
+                this.app.handleLinkClick(r.link, r)
               }}
             >Learn More &rarr;</Button>
           </CardBody>
@@ -116,7 +116,7 @@ class Search extends Component {
       if (row.length > 0) {
         rows.push(<Row>{row}</Row>);
       }
-      console.log(rows);
+      // console.log(rows);
     } else { rows = [] }
 
     return (

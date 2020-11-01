@@ -33,6 +33,9 @@ const linkShowUsrTarget = 1;
 const linkShowUsrLR = 0.1;
 //make user cred later?
 
+const showHistoryLen = 100;
+const clickHistoryLen = 100;
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -40,10 +43,12 @@ class App extends Component {
     let resourceData = {};
     resourceList.forEach((x) => { resourceData[x] = { vec: math.random([params], -1, 1), cred: 0 } })
     let userData = {};
-    userList.forEach((x) => { userData[x] = { vec: math.random([params], -1, 1), searchHistory: [], viewHistory: [] } })
+    userList.forEach((x) => { userData[x] = { vec: math.random([params], -1, 1), showHistory: [], viewHistory: [] } })
     this.state = {
       resourceData, userData, currentUser: userList[0],
-      searchResults: []
+      searchResults: [],
+      showHistory: [],
+      clickHistory: []
     };
     this.handleLinkClick = this.handleLinkClick.bind(this);
     this.handleLinkShow = this.handleLinkShow.bind(this);
@@ -82,8 +87,8 @@ class App extends Component {
     }
     let rd = this.state.resourceData;
     for (let resourceKey in this.resUpdates) {
-      if (!resourceKey in this.state.resourceData) {
-        console.log(resourceKey);
+      if (!(resourceKey in this.state.resourceData)) {
+        console.log(resourceKey + "not in resourceData");
       } else {
         rd[resourceKey].vec = math.subtract(rd[resourceKey].vec, this.resUpdates[resourceKey]);
       }
@@ -128,11 +133,11 @@ class App extends Component {
     }
   }
 
-  getRating = (userKey, resourceKey) => {
+  getRating = (userKey, resourceKey, bias = 0) => {
     if ((resourceKey in this.state.resourceData) && (userKey in this.state.userData)) {
-      return this.actF[activation][0](this.state.resourceData[resourceKey].cred + math.dot(this.state.userData[userKey].vec, this.state.resourceData[resourceKey].vec));
+      return this.actF[activation][0](bias + this.state.resourceData[resourceKey].cred + math.dot(this.state.userData[userKey].vec, this.state.resourceData[resourceKey].vec));
     }
-    console.log(userKey);
+    // console.log(userKey);
     return math.random(0, 1) - 100;
   }
 
@@ -148,8 +153,21 @@ class App extends Component {
     }
     this.updateWeights();
     console.log(this.getRating(this.state.currentUser, resourceKey));
+
+    let ch = this.state.clickHistory;
+    for (let i = 0; i < ch.length; i++) {
+      if (ch[i] === resourceKey) {
+        ch.splice(i, 1);
+        break;
+      }
+    }
+    ch.unshift(resourceKey);
+    if (ch.length > clickHistoryLen) {
+      ch.pop();
+    }
+    this.setState({ clickHistory: ch });
   }
-  handleLinkShow = (resourceKey) => {
+  handleLinkShow = (resourceKey, res) => {
     if (resourceKey in this.state.resourceData) {
       if (resourceKey in this.resCredUpdates) {
         this.resCredUpdates[resourceKey] += linkShowCred;
@@ -159,14 +177,28 @@ class App extends Component {
       this.trainUser(linkShowUsrLR, this.state.currentUser, resourceKey, linkShowUsrTarget);
       this.trainResource(linkShowResLR, this.state.currentUser, resourceKey, linkShowResTarget);
     }
+
+    let sh = this.state.showHistory;
+    for (let i = 0; i < sh.length; i++) {
+      if (sh[i].link === resourceKey) {
+        sh.splice(i, 1);
+        break;
+      }
+    }
+    sh.unshift(res);
+    if (sh.length > showHistoryLen) {
+      sh.pop();
+    }
+    this.setState({ showHistory: sh });
   }
+
   switchUser = (userKey) => {
     if (userKey in this.state.userData) {
       this.setState({ currentUser: userKey });
     }
   }
   orderedSearchResultsList = [];
-  handleSearch = async (e, handleShow) => {
+  handleSearch = async (e) => {
     e.preventDefault();
     let data = [];
     if (e.target["0"].value.trim()) {
@@ -176,9 +208,35 @@ class App extends Component {
     if (data) {
       this.orderedSearchResultsList = [];
       this.setState({ searchResults: data });
-      data.forEach(x => { this.handleLinkShow(x.link) });
+      data.forEach(x => { this.handleLinkShow(x.link, x) });
+    }
+    console.log({ "clickHistory": this.state.clickHistory, "searchHistory": this.state.showHistory });
+    this.compileFeed();
+  }
+  compileFeed = () => {
+    if (Array.isArray(this.state.showHistory) && this.state.searchResults.length) {
+      let orderedFeedResults = {}, orderedFeedResultsList = [];
+      this.state.showHistory.forEach(x => {
+        let bias = 0;
+        for (let i = 0; i < this.state.clickHistory.length; i++) {
+          if (this.state.clickHistory[i] === x.link) {
+            bias = bias + 2 * (i - clickHistoryLen) / clickHistoryLen;
+            break;
+          }
+        }
+        orderedFeedResults[this.getRating(this.state.currentUser, x.link, bias)] = x;
+      })
+      let keys = Object.keys(orderedFeedResults), i, len = keys.length;
+      keys.sort(function (a, b) { return b - a });
+      console.log([orderedFeedResults, "feed"]);
+      for (i = 0; i < len; i++) {
+        orderedFeedResultsList.push(orderedFeedResults[keys[i]]);
+      }
+      // console.log([orderedFeedResultsList, "feed"]);
+      return orderedFeedResultsList;
     }
   }
+
   render() {
     if (Array.isArray(this.state.searchResults) && this.state.searchResults.length && !this.orderedSearchResultsList.length) {
       let orderedSearchResults = {};
@@ -188,7 +246,7 @@ class App extends Component {
       let keys = Object.keys(orderedSearchResults), i, len = keys.length;
       keys.sort(function (a, b) { return a - b });
       for (i = 0; i < len; i++) {
-        console.log(keys[i] + orderedSearchResults[keys[i]].link);
+        // console.log(keys[i] + orderedSearchResults[keys[i]].link);
         this.orderedSearchResultsList.push(orderedSearchResults[keys[i]]);
       }
     }
