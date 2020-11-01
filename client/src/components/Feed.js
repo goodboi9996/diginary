@@ -15,11 +15,6 @@ import {
 class Feed extends Component {
   constructor(props) {
     super(props);
-    this.props.appPtr.updateWeights();
-    this.props.appPtr.handleSearch({
-      preventDefault: () => { },
-      target: { "0": { value: "8===D" } }
-    });
   }
   app = this.props.appPtr;
 

@@ -261,7 +261,7 @@ class App extends Component {
           <Route
             path='/feed'
             render={(props) => (
-              <Feed {...props} appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />
+              <Feed {...props} appPtr={this} rowSize={4} />
             )}
           />
           <Route
