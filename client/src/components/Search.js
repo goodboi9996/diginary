@@ -89,7 +89,9 @@ class Search extends Component {
             alt='' />
         }
         return <Card key={r.link}>
-          <CardHeader>{r.displayLink}</CardHeader>
+          <CardHeader style={{
+            "fontWeight": (r.link in this.app.state.resourceData) ? "500" : "normal"
+          }}>{r.displayLink}</CardHeader>
           {thumbnail}
           <CardBody>
             <CardTitle>{r.title}</CardTitle>
@@ -101,6 +103,7 @@ class Search extends Component {
                 this.app.handleLinkClick(r.link, r)
               }}
             >Learn More &rarr;</Button>
+            <Button style={{ "marginLeft": "10px" }}>Rate &rarr;</Button>
           </CardBody>
         </Card>
       });

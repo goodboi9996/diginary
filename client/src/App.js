@@ -11,14 +11,14 @@ const math = create(all, config);
 
 //our "database"
 const resourceList = ["https://www.mathsisfun.com/", "https://www.khanacademy.org/math", "http://www.math.com/", "https://www.mathplayground.com/", "https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math", "https://en.wikipedia.org/wiki/English_language", "https://www.ets.org/toefl", "https://en.wikipedia.org/wiki/English", "https://www.cambridgeenglish.org/", "https://www.elections.ny.gov/NYSBOE/download/voting/AbsenteeBallot-English.pdf"]
-const userList = ["goodboi9996", "6176UD", "3"];
+const userList = ["User 1", "User 2", "User 3"];
 
 //hyperparameters
 const params = 10;
 const activation = "sigmoid";
 const costfunction = "mse";
 const globalLearningRate = 0.5;
-const globalLambda = 0;
+const globalLambda = 0.1;
 
 //settings
 const linkClickCred = 0;
@@ -159,7 +159,7 @@ class App extends Component {
       this.trainResource(linkClickResLR, this.state.currentUser, resourceKey, linkClickResTarget);
     }
     this.updateWeights();
-    // console.log(this.getRating(this.state.currentUser, resourceKey));
+    console.log(this.getRating(this.state.currentUser, resourceKey));
 
     let ch = this.state.userData[this.state.currentUser].clickHistory;
     for (let i = 0; i < ch.length; i++) {
