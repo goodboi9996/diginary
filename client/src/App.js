@@ -43,7 +43,14 @@ class App extends Component {
     let resourceData = {};
     resourceList.forEach((x) => { resourceData[x] = { vec: math.random([params], -1, 1), cred: 0 } })
     let userData = {};
-    userList.forEach((x) => { userData[x] = { vec: math.random([params], -1, 1), showHistory: [], viewHistory: [] } })
+    userList.forEach((x) => {
+      userData[x] = {
+        vec: math.random([params], -1, 1),
+        searchResults: [],
+        showHistory: [],
+        clickHistory: []
+      }
+    })
     this.state = {
       resourceData, userData, currentUser: userList[0],
       searchResults: [],
@@ -154,7 +161,7 @@ class App extends Component {
     this.updateWeights();
     // console.log(this.getRating(this.state.currentUser, resourceKey));
 
-    let ch = this.state.clickHistory;
+    let ch = this.state.userData[this.state.currentUser].clickHistory;
     for (let i = 0; i < ch.length; i++) {
       if (ch[i] === resourceKey) {
         ch.splice(i, 1);
@@ -165,7 +172,9 @@ class App extends Component {
     if (ch.length > clickHistoryLen) {
       ch.pop();
     }
-    this.setState({ clickHistory: ch });
+    let temp = this.state.userData;
+    temp[this.state.currentUser].clickHistory = ch;
+    this.setState({ userData: temp });
   }
   handleLinkShow = (resourceKey, res) => {
     if (resourceKey in this.state.resourceData) {
@@ -178,7 +187,7 @@ class App extends Component {
       this.trainResource(linkShowResLR, this.state.currentUser, resourceKey, linkShowResTarget);
     }
 
-    let sh = this.state.showHistory;
+    let sh = this.state.userData[this.state.currentUser].showHistory;
     for (let i = 0; i < sh.length; i++) {
       if (sh[i].link === resourceKey) {
         sh.splice(i, 1);
@@ -189,12 +198,15 @@ class App extends Component {
     if (sh.length > showHistoryLen) {
       sh.pop();
     }
-    this.setState({ showHistory: sh });
+    let temp = this.state.userData;
+    temp[this.state.currentUser].showHistory = sh;
+    this.setState({ showHistory: temp });
   }
 
   switchUser = (userKey) => {
     if (userKey in this.state.userData) {
-      this.setState({ currentUser: userKey });
+      this.orderedSearchResultsList = [];
+      this.setState({ currentUser: userKey, searchResults: [] });
     }
   }
   orderedSearchResultsList = [];
@@ -211,16 +223,16 @@ class App extends Component {
       data.forEach(x => { this.handleLinkShow(x.link, x) });
     }
     console.log({ "clickHistory": this.state.clickHistory, "searchHistory": this.state.showHistory });
-    this.compileFeed();
+    // this.compileFeed();
   }
   compileFeed = () => {
-    if (Array.isArray(this.state.showHistory) && this.state.searchResults.length) {
+    if (Array.isArray(this.state.userData[this.state.currentUser].showHistory) && this.state.userData[this.state.currentUser].showHistory.length) {
       let orderedFeedResults = {}, orderedFeedResultsList = [];
-      this.state.showHistory.forEach(x => {
+      this.state.userData[this.state.currentUser].showHistory.forEach(x => {
         let bias = 0;
-        for (let i = 0; i < this.state.clickHistory.length; i++) {
-          if (this.state.clickHistory[i] === x.link) {
-            bias = bias + 2 * (i - clickHistoryLen) / clickHistoryLen;
+        for (let i = 0; i < this.state.userData[this.state.currentUser].clickHistory.length; i++) {
+          if (this.state.userData[this.state.currentUser].clickHistory[i] === x.link) {
+            bias = bias + 5 * (i - clickHistoryLen) / clickHistoryLen;
             break;
           }
         }
@@ -258,12 +270,12 @@ class App extends Component {
           // searchPtr={search} 
           />
           <Search appPtr={this} rowSize={4} orderedSearchResultsList={this.orderedSearchResultsList} />
-          <Route
+          {/* <Route
             path='/feed'
             render={(props) => (
               <Feed {...props} appPtr={this} rowSize={4} />
             )}
-          />
+          /> */}
           <Route
             path='/aipage'
             render={(props) => (
@@ -271,6 +283,7 @@ class App extends Component {
             )}
           />
           <Route path='/test' component={Test} />
+          <Feed appPtr={this} rowSize={3} />
         </div>
       </BrowserRouter >
     );

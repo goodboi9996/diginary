@@ -120,7 +120,7 @@ class Search extends Component {
     } else { rows = [] }
 
     return (
-      <div className="Search_all" >
+      <div className="Search_all" style={{ "marginBottom": "50px" }} >
         {
           (window.location.pathname == "/search") ? (
             <div className="Search" >

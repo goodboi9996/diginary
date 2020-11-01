@@ -25,15 +25,18 @@ class Navibar extends Component {
     return (
       <Navbar
         // bg="light" 
-        style={{ "backgroundColor": "#F9EAF1" }}
+        style={{ "backgroundColor": "#F9EAF1", "marginBottom": "50px" }}
         expand="lg"
       >
-        <Navbar.Brand href="/">Diginary</Navbar.Brand>
+        <Navbar.Brand href="/">
+          <img src="logo.png" width="170" height="45" alt="" />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link href="/search">Search</Nav.Link>
-            <Nav.Link href="/aipage">AI Page</Nav.Link>
+            <Nav.Link href="/feed">Profile</Nav.Link>
+            <Nav.Link href="/aipage">Add Resource</Nav.Link>
             <NavDropdown title={"Signed in as: " + this.props.appPtr.state.currentUser} id="basic-nav-dropdown">
               {this.props.userList.map(x => {
                 return <NavDropdown.Item
